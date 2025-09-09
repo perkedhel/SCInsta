@@ -17,7 +17,7 @@
 ///////////////////////////////////////////////////////////
 
 // * Tweak version *
-NSString *SCIVersionString = @"v0.8.0";
+NSString *SCIVersionString = @"v0.8.1";
 
 // Variables that work across features
 BOOL seenButtonEnabled = false;
@@ -84,6 +84,8 @@ BOOL isAuthenticationBeingShown = NO;
     [self authPrompt];
 }
 - (void)applicationDidBecomeActive:(id)arg1 {
+    %orig;
+    
     if ([SCIManager getBoolPref:@"flex_app_start"]) {
         [[objc_getClass("FLEXManager") sharedManager] showExplorer];
     }
