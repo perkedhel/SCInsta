@@ -1,12 +1,40 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <QuickLook/QuickLook.h>
+#import <os/log.h>
+#import <objc/message.h>
+
 #import "../modules/JGProgressHUD/JGProgressHUD.h"
-#import "./InstagramHeaders.h"
+
+#import "InstagramHeaders.h"
+#import "QuickLook.h"
+
+#ifdef __cplusplus
+#define _Bool bool
+#endif
+
+#define SCILog(fmt, ...) \
+    do { \
+        NSString *tmpStr = [NSString stringWithFormat:(fmt), ##__VA_ARGS__]; \
+        os_log(OS_LOG_DEFAULT, "[SCInsta] %{public}s", tmpStr.UTF8String); \
+    } while(0)
+
+#define SCILogId(prefix, obj) os_log(OS_LOG_DEFAULT, "[SCInsta Test] %{public}@: %{public}@", prefix, obj);
 
 @interface SCIUtils : NSObject
 
++ (BOOL)getBoolPref:(NSString *)key;
++ (double)getDoublePref:(NSString *)key;
++ (NSString *)getStringPref:(NSString *)key;
+
++ (void)cleanCache;
+
+// Displaying View Controllers
++ (void)showQuickLookVC:(NSArray<id> *)items;
++ (void)showShareVC:(id)item;
+
 // Colours
-+ (UIColor *)SCIColour_Primary;
++ (UIColor *)SCIColor_Primary;
 
 // Errors
 + (NSError *)errorWithDescription:(NSString *)errorDesc;
@@ -32,7 +60,11 @@
 + (BOOL)isNotch;
 
 + (BOOL)existingLongPressGestureRecognizerForView:(UIView *)view;
++ (BOOL)showConfirmation:(void(^)(void))okHandler title:(NSString *)title;
++ (BOOL)showConfirmation:(void(^)(void))okHandler cancelHandler:(void(^)(void))cancelHandler title:(NSString *)title;
 + (BOOL)showConfirmation:(void(^)(void))okHandler;
++ (BOOL)showConfirmation:(void(^)(void))okHandler cancelHandler:(void(^)(void))cancelHandler;
++ (void)showRestartConfirmation;
 + (void)prepareAlertPopoverIfNeeded:(UIAlertController*)alert inView:(UIView*)view;
 
 // Math

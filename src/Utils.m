@@ -1,11 +1,83 @@
-#import <UIKit/UIKit.h>
 #import "Utils.h"
-#import "InstagramHeaders.h"
 
 @implementation SCIUtils
 
++ (BOOL)getBoolPref:(NSString *)key {
+    if (![key length] || [[NSUserDefaults standardUserDefaults] objectForKey:key] == nil) return false;
+
+    return [[NSUserDefaults standardUserDefaults] boolForKey:key];
+}
++ (double)getDoublePref:(NSString *)key {
+    if (![key length] || [[NSUserDefaults standardUserDefaults] objectForKey:key] == nil) return 0;
+
+    return [[NSUserDefaults standardUserDefaults] doubleForKey:key];
+}
++ (NSString *)getStringPref:(NSString *)key {
+    if (![key length] || [[NSUserDefaults standardUserDefaults] objectForKey:key] == nil) return @"";
+
+    return [[NSUserDefaults standardUserDefaults] stringForKey:key];
+}
+
++ (void)cleanCache {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSMutableArray<NSError *> *deletionErrors = [NSMutableArray array];
+
+    // Temp folder
+    // * disabled bc app crashed trying to delete certain files inside it
+    //NSError *tempFolderError;
+    //[fileManager removeItemAtURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:&tempFolderError];
+
+    //if (tempFolderError) [deletionErrors addObject:tempFolderError];
+
+    // Analytics folder
+    NSError *analyticsFolderError;
+    NSString *analyticsFolder = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Application Support/com.burbn.instagram/analytics"];
+    [fileManager removeItemAtURL:[[NSURL alloc] initFileURLWithPath:analyticsFolder] error:&analyticsFolderError];
+
+    if (analyticsFolderError) [deletionErrors addObject:analyticsFolderError];
+    
+    // Caches folder
+    NSString *cachesFolder = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Caches"];
+    NSArray *cachesFolderContents = [fileManager contentsOfDirectoryAtURL:[[NSURL alloc] initFileURLWithPath:cachesFolder] includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil];
+    
+    for (NSURL *fileURL in cachesFolderContents) {
+        NSError *cacheItemDeletionError;
+        [fileManager removeItemAtURL:fileURL error:&cacheItemDeletionError];
+
+        if (cacheItemDeletionError) [deletionErrors addObject:cacheItemDeletionError];
+    }
+
+    // Log errors
+    if (deletionErrors.count > 1) {
+
+        for (NSError *error in deletionErrors) {
+            NSLog(@"[SCInsta] File Deletion Error: %@", error);
+        }
+
+    }
+
+}
+
+// Displaying View Controllers
++ (void)showQuickLookVC:(NSArray<id> *)items {
+    QLPreviewController *previewController = [[QLPreviewController alloc] init];
+    QuickLookDelegate *quickLookDelegate = [[QuickLookDelegate alloc] initWithPreviewItemURLs:items];
+
+    previewController.dataSource = quickLookDelegate;
+    
+    [topMostController() presentViewController:previewController animated:true completion:nil];
+}
++ (void)showShareVC:(id)item {
+    UIActivityViewController *acVC = [[UIActivityViewController alloc] initWithActivityItems:@[item] applicationActivities:nil];
+    if (is_iPad()) {
+        acVC.popoverPresentationController.sourceView = topMostController().view;
+        acVC.popoverPresentationController.sourceRect = CGRectMake(topMostController().view.bounds.size.width / 2.0, topMostController().view.bounds.size.height / 2.0, 1.0, 1.0);
+    }
+    [topMostController() presentViewController:acVC animated:true completion:nil];
+}
+
 // Colours
-+ (UIColor *)SCIColour_Primary {
++ (UIColor *)SCIColor_Primary {
     return [UIColor colorWithRed:0/255.0 green:152/255.0 blue:254/255.0 alpha:1];
 };
 
@@ -48,18 +120,22 @@
 
     return [SCIUtils getPhotoUrl:photo];
 }
-
 + (NSURL *)getVideoUrl:(IGVideo *)video {
     if (!video) return nil;
 
-    // Sort videos by quality
-    NSArray<NSDictionary *> *sortedVideoUrls = [video sortedVideoURLsBySize];
-    if ([sortedVideoUrls count] < 1 || sortedVideoUrls[0] == nil) return nil;
+    // The past (pre v398)
+    if ([video respondsToSelector:@selector(sortedVideoURLsBySize)]) {
+        NSArray<NSDictionary *> *sorted = [video sortedVideoURLsBySize];
+        NSString *urlString = sorted.firstObject[@"url"];
+        return urlString.length ? [NSURL URLWithString:urlString] : nil;
+    }
 
-    // First element in array is highest quality
-    NSURL *videoUrl = [NSURL URLWithString:[sortedVideoUrls[0] objectForKey:@"url"]];
+    // The present (post v398)
+    if ([video respondsToSelector:@selector(allVideoURLs)]) {
+        return [[video allVideoURLs] anyObject];
+    }
 
-    return videoUrl;
+    return nil;
 }
 + (NSURL *)getVideoUrlForMedia:(IGMedia *)media {
     if (!media) return nil;
@@ -112,8 +188,8 @@
 
     return NO;
 }
-+ (BOOL)showConfirmation:(void(^)(void))okHandler {
-    UIAlertController* alert = [UIAlertController alertControllerWithTitle:nil message:@"Are you sure?" preferredStyle:UIAlertControllerStyleAlert];
++ (BOOL)showConfirmation:(void(^)(void))okHandler title:(NSString *)title {
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:title message:@"Are you sure?" preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         okHandler();
     }]];
@@ -122,6 +198,36 @@
     [topMostController() presentViewController:alert animated:YES completion:nil];
 
     return nil;
+};
++ (BOOL)showConfirmation:(void(^)(void))okHandler cancelHandler:(void(^)(void))cancelHandler title:(NSString *)title {
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:nil message:@"Are you sure?" preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        okHandler();
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"No!" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        if (cancelHandler != nil) {
+            cancelHandler();
+        }
+    }]];
+
+    [topMostController() presentViewController:alert animated:YES completion:nil];
+
+    return nil;
+};
++ (BOOL)showConfirmation:(void(^)(void))okHandler {
+    return [self showConfirmation:okHandler title:nil];
+};
++ (BOOL)showConfirmation:(void(^)(void))okHandler cancelHandler:(void(^)(void))cancelHandler {
+    return [self showConfirmation:okHandler cancelHandler:cancelHandler title:nil];
+}
++ (void)showRestartConfirmation {
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Restart required" message:@"You must restart the app to apply this change" preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        exit(0);
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Later" style:UIAlertActionStyleCancel handler:nil]];
+
+    [topMostController() presentViewController:alert animated:YES completion:nil];
 };
 + (void)prepareAlertPopoverIfNeeded:(UIAlertController*)alert inView:(UIView*)view {
     if (alert.popoverPresentationController) {

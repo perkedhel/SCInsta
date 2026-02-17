@@ -1,5 +1,4 @@
 #import "../../InstagramHeaders.h"
-#import "../../Manager.h"
 #import "../../Utils.h"
 #import "../../Downloader/Download.h"
 
@@ -22,7 +21,7 @@ static void initDownloaders () {
 - (void)didMoveToSuperview {
     %orig;
 
-    if ([SCIManager getBoolPref:@"dw_feed_posts"]) {
+    if ([SCIUtils getBoolPref:@"dw_feed_posts"]) {
         [self addLongPressGestureRecognizer];
     }
 
@@ -32,8 +31,8 @@ static void initDownloaders () {
     NSLog(@"[SCInsta] Adding feed photo download long press gesture recognizer");
 
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    longPress.minimumPressDuration = [SCIManager getDoublePref:@"dw_finger_duration"];
-    longPress.numberOfTouchesRequired = [SCIManager getDoublePref:@"dw_finger_count"];
+    longPress.minimumPressDuration = [SCIUtils getDoublePref:@"dw_finger_duration"];
+    longPress.numberOfTouchesRequired = [SCIUtils getDoublePref:@"dw_finger_count"];
 
     [self addGestureRecognizer:longPress];
 }
@@ -75,7 +74,7 @@ static void initDownloaders () {
 - (void)didMoveToSuperview {
     %orig;
 
-    if ([SCIManager getBoolPref:@"dw_feed_posts"]) {
+    if ([SCIUtils getBoolPref:@"dw_feed_posts"]) {
         [self addLongPressGestureRecognizer];
     }
 
@@ -85,8 +84,8 @@ static void initDownloaders () {
     NSLog(@"[SCInsta] Adding feed video download long press gesture recognizer");
 
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    longPress.minimumPressDuration = [SCIManager getDoublePref:@"dw_finger_duration"];
-    longPress.numberOfTouchesRequired = [SCIManager getDoublePref:@"dw_finger_count"];
+    longPress.minimumPressDuration = [SCIUtils getDoublePref:@"dw_finger_duration"];
+    longPress.numberOfTouchesRequired = [SCIUtils getDoublePref:@"dw_finger_count"];
 
     [self addGestureRecognizer:longPress];
 }
@@ -116,7 +115,7 @@ static void initDownloaders () {
 - (void)didMoveToSuperview {
     %orig;
 
-    if ([SCIManager getBoolPref:@"dw_reels"]) {
+    if ([SCIUtils getBoolPref:@"dw_reels"]) {
         [self addLongPressGestureRecognizer];
     }
 
@@ -126,8 +125,8 @@ static void initDownloaders () {
     NSLog(@"[SCInsta] Adding reels photo download long press gesture recognizer");
 
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    longPress.minimumPressDuration = [SCIManager getDoublePref:@"dw_finger_duration"];
-    longPress.numberOfTouchesRequired = [SCIManager getDoublePref:@"dw_finger_count"];
+    longPress.minimumPressDuration = [SCIUtils getDoublePref:@"dw_finger_duration"];
+    longPress.numberOfTouchesRequired = [SCIUtils getDoublePref:@"dw_finger_count"];
 
     [self addGestureRecognizer:longPress];
 }
@@ -156,7 +155,7 @@ static void initDownloaders () {
 - (void)didMoveToSuperview {
     %orig;
 
-    if ([SCIManager getBoolPref:@"dw_reels"]) {
+    if ([SCIUtils getBoolPref:@"dw_reels"]) {
         [self addLongPressGestureRecognizer];
     }
 
@@ -166,8 +165,8 @@ static void initDownloaders () {
     NSLog(@"[SCInsta] Adding reels video download long press gesture recognizer");
 
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    longPress.minimumPressDuration = [SCIManager getDoublePref:@"dw_finger_duration"];
-    longPress.numberOfTouchesRequired = [SCIManager getDoublePref:@"dw_finger_count"];
+    longPress.minimumPressDuration = [SCIUtils getDoublePref:@"dw_finger_duration"];
+    longPress.numberOfTouchesRequired = [SCIUtils getDoublePref:@"dw_finger_count"];
 
     [self addGestureRecognizer:longPress];
 }
@@ -197,7 +196,7 @@ static void initDownloaders () {
 - (void)didMoveToSuperview {
     %orig;
 
-    if ([SCIManager getBoolPref:@"dw_story"]) {
+    if ([SCIUtils getBoolPref:@"dw_story"]) {
         [self addLongPressGestureRecognizer];
     }
 
@@ -207,8 +206,8 @@ static void initDownloaders () {
     NSLog(@"[SCInsta] Adding story photo download long press gesture recognizer");
 
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    longPress.minimumPressDuration = [SCIManager getDoublePref:@"dw_finger_duration"];
-    longPress.numberOfTouchesRequired = [SCIManager getDoublePref:@"dw_finger_count"];
+    longPress.minimumPressDuration = [SCIUtils getDoublePref:@"dw_finger_duration"];
+    longPress.numberOfTouchesRequired = [SCIUtils getDoublePref:@"dw_finger_count"];
 
     [self addGestureRecognizer:longPress];
 }
@@ -231,11 +230,11 @@ static void initDownloaders () {
 %end
 
 // Download story (videos)
-%hook IGStoryVideoView
+%hook IGStoryModernVideoView
 - (void)didMoveToSuperview {
     %orig;
 
-    if ([SCIManager getBoolPref:@"dw_story"]) {
+    if ([SCIUtils getBoolPref:@"dw_story"]) {
         [self addLongPressGestureRecognizer];
     }
 
@@ -245,8 +244,47 @@ static void initDownloaders () {
     //NSLog(@"[SCInsta] Adding story video download long press gesture recognizer");
 
     UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    longPress.minimumPressDuration = [SCIManager getDoublePref:@"dw_finger_duration"];
-    longPress.numberOfTouchesRequired = [SCIManager getDoublePref:@"dw_finger_count"];
+    longPress.minimumPressDuration = [SCIUtils getDoublePref:@"dw_finger_duration"];
+    longPress.numberOfTouchesRequired = [SCIUtils getDoublePref:@"dw_finger_count"];
+
+    [self addGestureRecognizer:longPress];
+}
+%new - (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
+    if (sender.state != UIGestureRecognizerStateBegan) return;
+
+    NSURL *videoUrl = [SCIUtils getVideoUrlForMedia:self.item];
+    
+    if (!videoUrl) {
+        [SCIUtils showErrorHUDWithDescription:@"Could not extract video url from story"];
+
+        return;
+    }
+
+    // Download video & show in share menu
+    initDownloaders();
+    [videoDownloadDelegate downloadFileWithURL:videoUrl
+                                 fileExtension:[[videoUrl lastPathComponent] pathExtension]
+                                      hudLabel:nil];
+}
+%end
+
+// Download story (videos, legacy)
+%hook IGStoryVideoView
+- (void)didMoveToSuperview {
+    %orig;
+
+    if ([SCIUtils getBoolPref:@"dw_story"]) {
+        [self addLongPressGestureRecognizer];
+    }
+
+    return;
+}
+%new - (void)addLongPressGestureRecognizer {
+    //NSLog(@"[SCInsta] Adding story video download long press gesture recognizer");
+
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    longPress.minimumPressDuration = [SCIUtils getDoublePref:@"dw_finger_duration"];
+    longPress.numberOfTouchesRequired = [SCIUtils getDoublePref:@"dw_finger_count"];
 
     [self addGestureRecognizer:longPress];
 }
@@ -297,7 +335,7 @@ static void initDownloaders () {
 - (void)didMoveToSuperview {
     %orig;
 
-    if ([SCIManager getBoolPref:@"save_profile"]) {
+    if ([SCIUtils getBoolPref:@"save_profile"]) {
         [self addLongPressGestureRecognizer];
     }
 
@@ -312,10 +350,13 @@ static void initDownloaders () {
 %new - (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
     if (sender.state != UIGestureRecognizerStateBegan) return;
 
-    IGImageRequest *_imageRequest = MSHookIvar<IGImageRequest *>(self, "_imageRequest");
-    if (!_imageRequest) return;
+    IGImageView *_imageView = MSHookIvar<IGImageView *>(self, "_imageView");
+    if (!_imageView) return;
     
-    NSURL *imageUrl = [_imageRequest url];
+    IGImageSpecifier *imageSpecifier = _imageView.imageSpecifier;
+    if (!imageSpecifier) return;
+
+    NSURL *imageUrl = imageSpecifier.url;
     if (!imageUrl) return;
 
     // Download image & preview in quick look
