@@ -1,6 +1,6 @@
 # SCInsta
 A feature-rich tweak for Instagram on iOS!\
-`Version v1.0.0` | `Tested on Instagram 414.0.0`
+`Version v1.1.1` | `Tested on Instagram 418.2.0`
 
 ---
 
@@ -35,10 +35,10 @@ A feature-rich tweak for Instagram on iOS!\
   - Enable note theming
   - Custom note themes
 - Focus/Distractions
-  - Hide explore posts grid
-  - Hide trending searches
-  - No suggested chats
   - No suggested users
+  - No suggested chats
+  - Hide trending searches
+  - Hide explore posts grid
 
 ### Feed
 - Hide stories tray
@@ -47,13 +47,17 @@ A feature-rich tweak for Instagram on iOS!\
 - No suggested for you (accounts)
 - No suggested reels
 - No suggested threads posts
+- Disable video autoplay
 
 ### Reels
 - Modify tap controls
 - Always show progress scrubber
+- Disable auto-unmuting reels
 - Confirm reel refresh
 - Hide reels header
+- Hide reels blend button
 - Disable scrolling reels
+- Prevent doom scrolling (limit maximum viewable reels)
 
 ### Saving
 - Download feed posts
@@ -65,11 +69,13 @@ A feature-rich tweak for Instagram on iOS!\
 
 ### Stories and messages
 - Keep deleted messages
-- Disable screenshot detection
+- Manually mark messages as seen
+- Disable typing status
 - Unlimited replay of direct stories
-- Disabling sending read receipts
-- Disable story seen receipt
 - Disable view-once limitations
+- Disable screenshot detection
+- Disable story seen receipt
+- Disable instants creation
 
 ### Navigation
 - Modify tab bar icon order
